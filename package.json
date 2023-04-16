@@ -2,6 +2,7 @@
   "name": "old-man-game",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://leonardo-fabricio.github.io/jogo-da-velha/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
