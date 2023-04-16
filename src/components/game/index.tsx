@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { dataInitial, ValueSquare, valueType } from "./data";
+import { dataInitial, ValueSquare } from "./data";
 
 export default function Game() {
   const [squares, setSquares] = useState(dataInitial);
   const [moves, setMoves] = useState(0);
-  const [winner, setWinner] = useState<valueType>(undefined);
+  const [winner, setWinner] = useState<"X" | "O" | undefined | "Empate">(
+    undefined
+  );
 
   const handleValueSquare = (index: number) => {
     setMoves(moves + 1);
@@ -89,10 +91,18 @@ export default function Game() {
     // Return null if no winner
     return null;
   }
+  function checkFilledSquares() {
+    return squares.filter((item) => item.filled === true).length;
+  }
+
   useEffect(() => {
-    const winner = checkWinner();
-    if (winner) {
-      setWinner(winner);
+    if (checkFilledSquares() == 9) {
+      setWinner("Empate");
+    } else {
+      const winner = checkWinner();
+      if (winner) {
+        setWinner(winner);
+      }
     }
   }, [squares]);
 
@@ -115,7 +125,7 @@ export default function Game() {
 
         {winner && (
           <>
-            <Alert>({winner}) Venceu!</Alert>
+            <Alert>{winner == "Empate" ? "Partida Empatada": `${winner} Venceu!`} </Alert>
             <NewGame onClick={handleReset}>Jogar Novamente</NewGame>
           </>
         )}
