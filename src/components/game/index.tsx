@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { dataInitial, ValueSquare } from "./data";
+import Image from "next/image";
+
+type OptionGame = "1x1" | "bot" | "server";
 
 export default function Game() {
   const [squares, setSquares] = useState(dataInitial);
@@ -8,6 +11,7 @@ export default function Game() {
   const [winner, setWinner] = useState<"X" | "O" | undefined | "Empate">(
     undefined
   );
+  const [typeGame, setTypeGame] = useState<OptionGame>();
 
   const handleValueSquare = (index: number) => {
     setMoves(moves + 1);
@@ -16,9 +20,14 @@ export default function Game() {
     newArray[index].filled = true;
     setSquares(newArray);
   };
-  const handleReset = () => {
+  const handleReset = (alterType?: boolean) => {
     setSquares(dataInitial);
     setWinner(undefined);
+    if (alterType) setTypeGame(undefined);
+  };
+
+  const handleTypeGame = (type: OptionGame) => {
+    setTypeGame(type);
   };
   function checkWinner() {
     // Check horizontal lines
@@ -96,37 +105,61 @@ export default function Game() {
   }
 
   useEffect(() => {
-    if (checkFilledSquares() == 9) {
+    const winner = checkWinner();
+    if (winner) {
+      setWinner(winner);
+    } else if (checkFilledSquares() == 9) {
       setWinner("Empate");
-    } else {
-      const winner = checkWinner();
-      if (winner) {
-        setWinner(winner);
-      }
     }
   }, [squares]);
 
   return (
     <>
       <GameContainer>
-        <GameMain>
-          {squares.map((item, index) => {
-            return (
-              <Square
-                key={index}
-                value={item.value}
-                onClick={() => {
-                  if (!item.filled) handleValueSquare(index);
-                }}
-              />
-            );
-          })}
-        </GameMain>
+        <ButtonExit onClick={() => handleReset(true)} />
+        {!typeGame ? (
+          <>
+            <Image
+              src="/assets/jogo-da-velha.png"
+              alt="jogo da velha"
+              height={400}
+              width={400}
+            />
+            <DivButtons>
+              <TypeGame onClick={() => handleTypeGame("1x1")}>1x1</TypeGame>
+              <TypeGame onClick={() => handleTypeGame("bot")}>
+                Jogar contra bot
+              </TypeGame>
+              <TypeGame onClick={() => handleTypeGame("server")}>
+                criar servidor
+              </TypeGame>
+            </DivButtons>
+          </>
+        ) : (
+          <GameMain>
+            {squares.map((item, index) => {
+              return (
+                <Square
+                  disabled={winner !== undefined}
+                  key={index}
+                  value={item.value}
+                  onClick={() => {
+                    if (!item.filled) handleValueSquare(index);
+                  }}
+                />
+              );
+            })}
+          </GameMain>
+        )}
 
         {winner && (
           <>
-            <Alert>{winner == "Empate" ? "Partida Empatada": `${winner} Venceu!`} </Alert>
-            <NewGame onClick={handleReset}>Jogar Novamente</NewGame>
+            <Alert>
+              {winner == "Empate" ? "Partida Empatada" : `(${winner}) Venceu!`}{" "}
+            </Alert>
+            <NewGame onClick={() => handleReset(false)}>
+              Jogar novamente
+            </NewGame>
           </>
         )}
       </GameContainer>
@@ -159,7 +192,8 @@ const Square = styled.button<ValueSquare>`
   width: 130px;
   height: 130px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 25px;
+  color: ${(props) => (props.value === "X" ? "blue" : "red")};
 
   :active {
     opacity: 0.6;
@@ -188,5 +222,43 @@ const NewGame = styled.button`
   padding: 8px;
   :active {
     opacity: 0.6;
+  }
+`;
+
+const DivButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const TypeGame = styled.button`
+  border: none;
+  border-radius: 8px;
+  background: #010199;
+  padding: 8px;
+  color: white;
+  cursor: pointer;
+
+  :active {
+    opacity: 0.6;
+  }
+`;
+
+const ButtonExit = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  border-radius: 8px;
+  background: red;
+  padding: 8px;
+  color: white;
+  cursor: pointer;
+  width: 10px;
+
+  :active {
+    opacity: 0.6;
+  }
+  ::after {
+    content: "X";
   }
 `;
