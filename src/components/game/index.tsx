@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { dataInitial, ValueSquare } from "./data";
 import Image from "next/image";
-
+import ImageGame from "public/assets/jogo-da-velha.png"
 type OptionGame = "1x1" | "bot" | "server";
 
 export default function Game() {
@@ -120,7 +120,7 @@ export default function Game() {
         {!typeGame ? (
           <>
             <Image
-              src="/assets/jogo-da-velha.png"
+              src={ImageGame}
               alt="jogo da velha"
               height={400}
               width={400}
